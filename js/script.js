@@ -6,12 +6,26 @@ const jobRoleOther = document.getElementById('other-job-role');
 const jobRole = document.getElementById('title');
 jobRoleOther.style.display = 'none';
 jobRole.addEventListener('input', (e) => {
-    if (jobRole.value === 'other') { jobRoleOther.style.display = '' };
-}); 
+    jobRole.value === 'other' ? jobRoleOther.style.display = '' : jobRoleOther.style.display = 'none';
+});
 
 //Hide Designs until designs are clicked
 const shirtDesign = document.getElementById('design');
-const shirtColors = document.getElementById('shirt-colors');
-const shirtThemes = document.getElementById('color');
-if (shirtDesign.value === 'Select Theme') { }
+const shirtColor = document.getElementById('color');
+displayShirtColor(shirtDesign.value);
 
+
+function displayShirtColor(data) {
+    for (let i = 0; i < shirtColor.length; i++) {
+        let shirt = shirtColor[i];
+        if(shirt.getAttribute('data-theme') === data) {
+            shirt.style.display = '';
+        } else {
+            shirt.style.display = 'none';
+        }
+    }
+}
+
+shirtDesign.addEventListener('input', (e) => {
+    displayShirtColor(shirtDesign.value);
+});

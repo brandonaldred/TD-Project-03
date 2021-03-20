@@ -19,9 +19,9 @@ function displayShirtColor(data, change) {
     for (let i = 0; i < shirtColor.length; i++) {
         let shirt = shirtColor[i];
         if (shirt.getAttribute('data-theme') === data) {
-            shirt.style.display = '';
+            shirt.hidden = false;
         } else {
-            shirt.style.display = 'none';
+            shirt.hidden = true;
         }
     }
     if (change) {

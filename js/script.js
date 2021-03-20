@@ -1,7 +1,20 @@
 //Grab namefield & focus
 document.getElementById('name').focus();
 
-//Hide 'other' jobrole input field until other is selected
+//Grab email field
+let emailEl = document.getElementById('email');
+
+//Validate Email Address
+function emailValidate(email) {
+    const regEx = /^\w*@\w*\.\w{2,}$/g;
+    if (!regEx.test(email)) {
+        emailEl.previousSibling.previousSibling.previousSibling.textContent = 'Email Address (Must be a valid Email):';
+    } else {
+        emailEl.previousSibling.previousSibling.previousSibling.textContent = 'Email Address:';
+    }
+}
+
+//Hide 'other' job role input field until other is selected
 const jobRoleOther = document.getElementById('other-job-role');
 const jobRole = document.getElementById('title');
 jobRoleOther.style.display = 'none';
@@ -27,7 +40,13 @@ function displayShirtColor(data, change) {
     }
 }
 
+//Adding listener for email address
+email.addEventListener('input', () => {
+    emailValidate(email.value);
+});
+
 //Adding event listener to the design selector and updating shirt color changes
 shirtDesign.addEventListener('change', () => {
     displayShirtColor(shirtDesign.value, true);
 });
+

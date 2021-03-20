@@ -19,16 +19,11 @@ function displayShirtColor(data, change) {
     for (let i = 0; i < shirtColor.length; i++) {
         let shirt = shirtColor[i];
         if (shirt.getAttribute('data-theme') === data) {
+            shirt.selected = true;
             shirt.hidden = false;
         } else {
             shirt.hidden = true;
         }
-    }
-    if (change) {
-        let pleaseSelect = document.createElement('option');
-        pleaseSelect.innerText = 'Select A Color';
-        shirtColor.prepend(pleaseSelect);
-        shirtColor.selectedIndex = 0;
     }
 }
 

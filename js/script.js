@@ -8,9 +8,7 @@ let emailEl = document.getElementById('email');
 function emailValidate(email) {
     const regEx = /^\w*@\w*\.\w{2,}$/g;
     if (!regEx.test(email)) {
-        emailEl.previousSibling.previousSibling.previousSibling.textContent = 'Email Address (Must be a valid Email):';
-    } else {
-        emailEl.previousSibling.previousSibling.previousSibling.textContent = 'Email Address:';
+       //Do Something
     }
 }
 
@@ -49,4 +47,22 @@ email.addEventListener('input', () => {
 shirtDesign.addEventListener('change', () => {
     displayShirtColor(shirtDesign.value, true);
 });
+
+
+//Add up selected courses
+const totalCost = document.getElementById('activities-cost');
+function addCost(amount) {
+    console.log(totalCost.innerHTML);ef
+    let total = Number(totalCost.innerText) + Number(amount);
+    totalCost.innerHTML = `Total: $${total}`;
+
+}
+
+
+//Get boxes checked value to know what to add or subtract
+const courses = document.getElementById('activities');
+courses.addEventListener('change', (e) => {
+    let cost = e.target.getAttribute('data-cost');
+    e.target.checked ? addCost(cost) : console.log('false');
+    });
 

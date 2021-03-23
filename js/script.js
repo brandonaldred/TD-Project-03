@@ -8,7 +8,7 @@ let emailEl = document.getElementById('email');
 function emailValidate(email) {
     const regEx = /^\w*@\w*\.\w{2,}$/g;
     if (!regEx.test(email)) {
-       //Do Something
+        //Do Something
     }
 }
 
@@ -51,9 +51,15 @@ shirtDesign.addEventListener('change', () => {
 
 //Add up selected courses
 const totalCost = document.getElementById('activities-cost');
-function addCost(amount) {
-    console.log(totalCost.innerHTML);ef
-    let total = Number(totalCost.innerText) + Number(amount);
+
+function addCost(amount, bool) {
+    let total;
+    let match = Number(totalCost.innerText.match(/\d+/));
+    if (bool) {
+        total = match + Number(amount);
+    } else {
+        total = match - Number(amount);
+    }
     totalCost.innerHTML = `Total: $${total}`;
 
 }
@@ -63,6 +69,5 @@ function addCost(amount) {
 const courses = document.getElementById('activities');
 courses.addEventListener('change', (e) => {
     let cost = e.target.getAttribute('data-cost');
-    e.target.checked ? addCost(cost) : console.log('false');
-    });
-
+    e.target.checked ? addCost(cost, true) : addCost(cost, false);
+});

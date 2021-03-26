@@ -5,11 +5,27 @@ userName.focus();
 //Grab email field
 let emailEl = document.getElementById('email');
 
+
+//Creating an element to enter for valid email
+function enterValidEmail() {
+    const emailHint = document.getElementById('email-hint');
+    const span = document.createElement('span');
+    span.className = 'enter-valid-email';
+    if (emailHint.parentNode.querySelectorAll('.enter-valid-email').length === 0) {
+        span.style.color = 'red';
+        span.textContent = 'Please insert a valid e-mail';
+        emailHint.parentNode.insertBefore(span, emailHint);
+    }
+}
+
 //Validate Email Address
 function emailValidate(email) {
     const regEx = /^\w*@\w*\.\w{2,}$/g;
     if (!regEx.test(email)) {
-        //Do Something
+        enterValidEmail();
+    } else {
+        const span = document.querySelector('.enter-valid-email');
+        span.parentNode.removeChild(span);
     }
 }
 
@@ -26,7 +42,7 @@ const shirtDesign = document.getElementById('design');
 displayShirtColor(shirtDesign.value, false);
 
 //Function to change shirt color options based on the design selected
-function displayShirtColor(data, change) {
+function displayShirtColor(data) {
     const shirtColor = document.getElementById('color');
     for (let i = 0; i < shirtColor.length; i++) {
         let shirt = shirtColor[i];
@@ -69,17 +85,17 @@ function addCost(amount, bool, time) {
     totalCost.innerHTML = `Total: $${total}`;
 }
 
-function removeTimeConflict (time) {
-   for (let i = 0; i < times.length; i++) {
-       if(times[i].getAttribute('data-day-and-time') === time && !times[i].checked) {
-           times[i].disabled = true;
-       }
-   }
+function removeTimeConflict(time) {
+    for (let i = 0; i < times.length; i++) {
+        if (times[i].getAttribute('data-day-and-time') === time && !times[i].checked) {
+            times[i].disabled = true;
+        }
+    }
 }
 
 function restoreActivities(time) {
-    for (let i = 0; i <times.length; i++) {
-        if(times[i].getAttribute('data-day-and-time') === time && times[i].disabled) {
+    for (let i = 0; i < times.length; i++) {
+        if (times[i].getAttribute('data-day-and-time') === time && times[i].disabled) {
             times[i].disabled = false;
         }
     }
@@ -91,6 +107,13 @@ courses.addEventListener('change', (e) => {
     e.target.checked ? addCost(cost, true, time) : addCost(cost, false, time);
 });
 
+courses.addEventListener('focusin', (e) => {
+    e.target.parentNode.style.borderColor = 'rgb(9, 73, 250)';
+});
+
+courses.addEventListener('focusout', (e) => {
+    e.target.parentNode.style.borderColor = '';
+});
 
 
 
@@ -98,16 +121,16 @@ courses.addEventListener('change', (e) => {
 
 
 //Change/hide fields depending on payment method selected
-function paymentMethods (type) {
+function paymentMethods(type) {
     if (type === 'credit-card') {
         document.getElementById('credit-card').style.display = '';
         document.getElementById('paypal').style.display = 'none';
         document.getElementById('bitcoin').style.display = 'none';
-    } else if(type === 'paypal') {
+    } else if (type === 'paypal') {
         document.getElementById('credit-card').style.display = 'none';
         document.getElementById('paypal').style.display = '';
         document.getElementById('bitcoin').style.display = 'none';
-    } else if(type === 'bitcoin') {
+    } else if (type === 'bitcoin') {
         document.getElementById('credit-card').style.display = 'none';
         document.getElementById('paypal').style.display = 'none';
         document.getElementById('bitcoin').style.display = '';
@@ -127,5 +150,5 @@ submit[0].addEventListener('click', (e) => {
     if (!userName.value) {
         console.log('enter name');
         e.preventDefault();
-    }    
+    }
 });

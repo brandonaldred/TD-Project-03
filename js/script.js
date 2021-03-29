@@ -263,7 +263,7 @@ function ccFormat(ccNumber) {
     }
 }
 
-//To be applied
+//To be applied & insert image
 // background: url('') no-repeat 0;
 // background-size: contain;
 // background-position: right;

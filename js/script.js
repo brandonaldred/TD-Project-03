@@ -181,94 +181,92 @@ expMonth.addEventListener('change', (e) => {
     removeExpYear(e.target.value);
 });
 
-//Validate CC Number
-function ccValidate(ccNumber,format) {
-    const regEx = /^(\d{4})-?(\d{4})-?(\d{4})-?(\d{4})$/g;
-    if (!regEx.test(ccNumber)) {
-        ;
-        enterValidCC();
-    } else {
-        const span = document.querySelector('.enter-valid');
-        if (span) {
-            span.parentNode.removeChild(span);
-            format.value = `$1-$2-$3-$4`;
-        }
-    }
-}
-
-//Creating an element to enter for valid CC
-function enterValidCC() {
-    const emailHint = document.getElementById('cc-hint');
-    const span = document.createElement('span');
-    span.className = 'enter-valid';
-    if (emailHint.parentNode.querySelectorAll('.enter-valid').length === 0) {
-        span.style.color = 'red';
-        span.textContent = 'Please insert a valid credit card number';
-        emailHint.parentNode.insertBefore(span, emailHint);
-    }
-}
-
-const creditCardNum = document.getElementById('cc-num');
-creditCardNum.addEventListener('input', (e) => {
-    let ccNumber =  e.target.value;
-    let format = e.target;
-    ccValidate(ccNumber, format);
-});
-
-
-/////Custom CC Validator with card type
-const input = document.querySelector('input');
-const div = document.querySelector('div');
-const p = document.querySelector('p');
-
+//Different RegEx's depending on type of card and digit pattern
 const ccRegEx = /^(\d{4})[ -]?(\d{4})[ -]?(\d{4})[ -]?(\d{4})$/;
 const amRegEx = /^(\d{4})[ -]?(\d{6})[ -]?(\d{5})/;
 
-function ccFormat(ccNumber) {
+const emailHint = document.getElementById('cc-hint');
+const ccInput = document.getElementById('cc-num');
+insertLogo(1);
+
+function ccType (number) {
     let type = '';
-    div.textContent = '';
-    if (/^4/.test(ccNumber)) {
-        type = 'Visa'
+    if (/^4/.test(number)) {
+        type = 'visa'
     }
-    if (/^6/.test(ccNumber)) {
-        type = 'Discover'
+    if (/^6/.test(number)) {
+        type = 'discover'
     }
-    if (/^34/.test(ccNumber) || /^37/.test(ccNumber)) {
-        type = 'American express';
+    if (/^34/.test(number) || /^37/.test(number)) {
+        type = 'amex';
     }
-    if (/^5[1-5]/.test(ccNumber)) {
-        type = 'Mastercard';
+    if (/^5[1-5]/.test(number)) {
+        type = 'mastercard';
     }
-    if (!ccNumber || /\D/.test(ccNumber)) {
-        type = 'A valid credit card is required';
+    if (/\D/.test(number)) {
+        type = 'invalid';
     }
-    p.textContent = type;
-    let output = '';
-    if ((type === 'Visa' || type === 'Mastercard' || type === 'Discover') && ccNumber.length === 16) {
-        output = ccNumber.match(ccRegEx);
-        div.textContent = `${output[1]}-${output[2]}-${output[3]}-${output[4]}`
-    } else if (type === 'American express' && ccNumber.length === 15) {
-        output = ccNumber.match(amRegEx);
-        div.textContent = `${output[1]}-${output[2]}-${output[3]}`;
-    } else {
-        if (!output && type === 'Visa') {
-            div.textContent = 'Please enter a valid Visa credit card number';
-        }
-        if (!output && type === 'American express') {
-            div.textContent = 'Please enter a valid American Express credit card number';
-        }
-        if (!output && type === 'Mastercard') {
-            div.textContent = 'Please enter a valid Mastercard credit card number';
-        }
+    if (type == '') {
+        type = 'cc';
     }
+    return type;
 }
 
-//To be applied & insert image
-// background: url('') no-repeat 0;
-// background-size: contain;
-// background-position: right;
-// padding-right: 75px;
 
-input.addEventListener('input', (e) => {
-    ccFormat(e.target.value);
+function insertLogo(number) {
+    ccInput.style.backgroundImage = `url('img/${ccType(number)}.png')`;
+    ccInput.style.backgroundRepeat = "no-repeat";
+    ccInput.style.backgroundSize = "35px";
+    ccInput.style.backgroundPosition = "left";
+    ccInput.style.paddingLeft = "40px";
+}
+
+function ccValidate(number) {
+    let type = ccType(number);
+    let output = '';
+    let spanText = '';
+    if ((type === 'Visa' || type === 'Mastercard' || type === 'Discover') && ccNumber.length === 16) {
+        output = ccNumber.match(ccRegEx);
+        spanText = `${output[1]}-${output[2]}-${output[3]}-${output[4]}`
+    } else if (type === 'American express' && ccNumber.length === 15) {
+        output = ccNumber.match(amRegEx);
+        spanText = `${output[1]}-${output[2]}-${output[3]}`;
+    } else {
+        if (!output && type === 'Visa') {
+
+            spanText = 'Please enter a valid Visa credit card number';
+        }
+        if (!output && type === 'American express') {
+            spanText = 'Please enter a valid American Express credit card number';
+        }
+        if (!output && type === 'Mastercard') {
+            spanText = 'Please enter a valid Mastercard credit card number';
+        }
+    }
+    return spanText;
+}
+
+ccInput.addEventListener('input',(e) => {
+    ccNumber = e.target.value;
+    insertLogo(ccNumber);
+    ccValidate(ccNumber);
+});
+
+
+const zipInput = document.getElementById('zip');
+zipInput.setAttribute('maxlength', 5);
+
+zipInput.addEventListener('input', (e) => {
+    if(/\D/.test(e.target.value)) {
+        zipInput.value = zipInput.value.replace(/\D/,'');
+    }
+});
+
+const cvvInput = document.getElementById('cvv');
+cvvInput.setAttribute('maxlength', 3);
+
+cvvInput.addEventListener('input', (e) => {
+    if(/\D/.test(e.target.value)) {
+        cvvInput.value = cvvInput.value.replace(/\D/,'');
+    }
 });

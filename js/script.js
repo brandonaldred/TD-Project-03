@@ -1,14 +1,50 @@
-//Grab namefield & focus
-const userName = document.getElementById('name');
-userName.focus();
+let grabEl = {
+    id: function(id) {return document.getElementById(id);},
+    class: function(id) {return document.getElementById(id);},
+    query: function(id) {return document.querySelectorAll(id);},
+    queryAll: function(id) {return document.querySelectorAll(id);},
+    tag: function(id) {return document.getElementsByTagName(id);}
+}
 
-//Grab email field
-let emailEl = document.getElementById('email');
+//Declaration of all elements
+const userName = grabEl.id('name');
+const emailEl = grabEl.id('email');
+const jobRoleOther = grabEl.id('other-job-role');
+const jobRole = grabEl.id('title');
+const shirtDesign = grabEl.id('design');
+const courses = grabEl.id('activities');
+const times = courses.querySelectorAll('input');
+const totalCost = grabEl.id('activities-cost');
+const paymentMethod = grabEl.id('payment');
+const form = grabEl.tag('form');
+const submit = grabEl.tag('button');
+const date = new Date();
+const month = date.getMonth() + 1;
+const year = date.getFullYear();
+const expMonth = grabEl.id('exp-month');
+const currentYear = document.createElement('option');
+const cvvInput = grabEl.id('cvv');
+const ccRegEx = /^(\d{4})[ -]?(\d{4})[ -]?(\d{4})[ -]?(\d{4})$/;
+const amRegEx = /^(\d{4})[ -]?(\d{6})[ -]?(\d{5})/;
+const email = grabEl.id('email');
+const emailHint = grabEl.id('cc-hint');
+const ccInput = grabEl.id('cc-num');
+const zipInput = grabEl.id('zip');
+
+//Intial modifications for selections and inputs
+jobRoleOther.style.display = 'none';
+paymentMethod[1].selected = true;
+ccInput.setAttribute('maxlength', 16);
+cvvInput.setAttribute('maxlength', 3);
+zipInput.setAttribute('maxlength', 5);
+displayShirtColor(shirtDesign.value, false);
+displayShirtColor(shirtDesign.value, false);
+paymentMethods(paymentMethod[1].value);
 
 
 //Creating an element to enter for valid email
 function enterValidEmail() {
-    const emailHint = document.getElementById('email-hint');
+    const emailHint = grabEl.id('email-hint');
     const span = document.createElement('span');
     span.className = 'enter-valid-email';
     if (emailHint.parentNode.querySelectorAll('.enter-valid-email').length === 0) {
@@ -19,7 +55,6 @@ function enterValidEmail() {
 }
 
 //Validate Email Address
-
 //Split into 3 matches by excluding @ and . before com or net, etc.
 function emailValidate(email) {
     const regEx = /^\w*@\w*\.\w{2,}$/g;
@@ -27,28 +62,16 @@ function emailValidate(email) {
         ;
         enterValidEmail();
     } else {
-        const span = document.querySelector('.enter-valid-email');
+        const span = grabEl.query('.enter-valid-email');
         if (span) {
             span.parentNode.removeChild(span);
         }
     }
 }
 
-//Hide 'other' job role input field until other is selected
-const jobRoleOther = document.getElementById('other-job-role');
-const jobRole = document.getElementById('title');
-jobRoleOther.style.display = 'none';
-jobRole.addEventListener('input', (e) => {
-    jobRole.value === 'other' ? jobRoleOther.style.display = '' : jobRoleOther.style.display = 'none';
-});
-
-//Getting the shirt design value and updating color drop down
-const shirtDesign = document.getElementById('design');
-displayShirtColor(shirtDesign.value, false);
-
 //Function to change shirt color options based on the design selected
 function displayShirtColor(data) {
-    const shirtColor = document.getElementById('color');
+    const shirtColor = grabEl.id('color');
     for (let i = 0; i < shirtColor.length; i++) {
         let shirt = shirtColor[i];
         if (shirt.getAttribute('data-theme') === data) {
@@ -59,24 +82,7 @@ function displayShirtColor(data) {
         }
     }
 }
-
-//Adding listener for email address
-email.addEventListener('input', () => {
-    emailValidate(email.value);
-});
-
-//Adding event listener to the design selector and updating shirt color changes
-shirtDesign.addEventListener('change', () => {
-    displayShirtColor(shirtDesign.value, true);
-});
-
-
 //Add up selected courses
-//Get boxes checked value to know what to add or subtract
-const courses = document.getElementById('activities');
-const times = courses.querySelectorAll('input');
-const totalCost = document.getElementById('activities-cost');
-
 function addCost(amount, bool, time) {
     let total;
     let match = Number(totalCost.innerText.match(/\d+/));
@@ -106,10 +112,49 @@ function restoreActivities(time) {
     }
 }
 
+//Event listeners on items that update real time
+email.addEventListener('input', () => {
+    emailValidate(email.value);
+});
+
+jobRole.addEventListener('input', (e) => {
+    jobRole.value === 'other' ? jobRoleOther.style.display = '' : jobRoleOther.style.display = 'none';
+});
+
+zipInput.addEventListener('input', (e) => {
+    if(/\D/.test(e.target.value)) {
+        zipInput.value = zipInput.value.replace(/\D/,'');
+    }
+});
+
+cvvInput.addEventListener('input', (e) => {
+    if(/\D/.test(e.target.value)) {
+        cvvInput.value = cvvInput.value.replace(/\D/,'');
+    }
+});
+
+ccInput.addEventListener('input',(e) => {
+    ccNumber = e.target.value;
+    insertLogo(ccNumber);
+    ccValidate(ccNumber);
+});
+
+shirtDesign.addEventListener('change', () => {
+    displayShirtColor(shirtDesign.value, true);
+});
+
 courses.addEventListener('change', (e) => {
     let time = e.target.getAttribute('data-day-and-time');
     let cost = e.target.getAttribute('data-cost');
     e.target.checked ? addCost(cost, true, time) : addCost(cost, false, time);
+});
+
+paymentMethod.addEventListener('change', (e) => {
+    paymentMethods(paymentMethod.value);
+});
+
+expMonth.addEventListener('change', (e) => {
+    removeExpYear(e.target.value);
 });
 
 courses.addEventListener('focusin', (e) => {
@@ -120,37 +165,6 @@ courses.addEventListener('focusout', (e) => {
     e.target.parentNode.style.borderColor = '';
 });
 
-
-
-
-
-
-//Change/hide fields depending on payment method selected
-function paymentMethods(type) {
-    if (type === 'credit-card') {
-        document.getElementById('credit-card').style.display = '';
-        document.getElementById('paypal').style.display = 'none';
-        document.getElementById('bitcoin').style.display = 'none';
-    } else if (type === 'paypal') {
-        document.getElementById('credit-card').style.display = 'none';
-        document.getElementById('paypal').style.display = '';
-        document.getElementById('bitcoin').style.display = 'none';
-    } else if (type === 'bitcoin') {
-        document.getElementById('credit-card').style.display = 'none';
-        document.getElementById('paypal').style.display = 'none';
-        document.getElementById('bitcoin').style.display = '';
-    }
-}
-
-const paymentMethod = document.getElementById('payment');
-paymentMethod[1].selected = true;
-paymentMethods(paymentMethod[1].value);
-paymentMethod.addEventListener('change', (e) => {
-    paymentMethods(paymentMethod.value);
-});
-
-const form = document.getElementsByTagName('form');
-const submit = document.getElementsByTagName('button');
 submit[0].addEventListener('click', (e) => {
     if (!userName.value) {
         console.log('enter name');
@@ -158,14 +172,24 @@ submit[0].addEventListener('click', (e) => {
     }
 });
 
-
-//Credit card validation
-const date = new Date();
-const month = date.getMonth() + 1;
-const year = date.getFullYear();
-
+//Change/hide fields depending on payment method selected
+function paymentMethods(type) {
+    if (type === 'credit-card') {
+        grabEl.id('credit-card').style.display = '';
+        grabEl.id('paypal').style.display = 'none';
+        grabEl.id('bitcoin').style.display = 'none';
+    } else if (type === 'paypal') {
+        grabEl.id('credit-card').style.display = 'none';
+        grabEl.id('paypal').style.display = '';
+        grabEl.id('bitcoin').style.display = 'none';
+    } else if (type === 'bitcoin') {
+        grabEl.id('credit-card').style.display = 'none';
+        grabEl.id('paypal').style.display = 'none';
+        grabEl.id('bitcoin').style.display = '';
+    }
+}
 function removeExpYear(selectedMonth) {
-    const expYear = document.getElementById('exp-year');
+    const expYear = grabEl.id('exp-year');
     const options = expYear.querySelectorAll('option');
     if (options[1].value == year && selectedMonth < month) {
         options[1].hidden = true;
@@ -174,21 +198,6 @@ function removeExpYear(selectedMonth) {
     }
 
 }
-
-const expMonth = document.getElementById('exp-month');
-const currentYear = document.createElement('option');
-expMonth.addEventListener('change', (e) => {
-    removeExpYear(e.target.value);
-});
-
-//Different RegEx's depending on type of card and digit pattern
-const ccRegEx = /^(\d{4})[ -]?(\d{4})[ -]?(\d{4})[ -]?(\d{4})$/;
-const amRegEx = /^(\d{4})[ -]?(\d{6})[ -]?(\d{5})/;
-
-const emailHint = document.getElementById('cc-hint');
-const ccInput = document.getElementById('cc-num');
-insertLogo(1);
-
 function ccType (number) {
     let type = '';
     if (/^4/.test(number)) {
@@ -211,8 +220,6 @@ function ccType (number) {
     }
     return type;
 }
-
-
 function insertLogo(number) {
     ccInput.style.backgroundImage = `url('img/${ccType(number)}.png')`;
     ccInput.style.backgroundRepeat = "no-repeat";
@@ -220,53 +227,17 @@ function insertLogo(number) {
     ccInput.style.backgroundPosition = "left";
     ccInput.style.paddingLeft = "40px";
 }
-
 function ccValidate(number) {
     let type = ccType(number);
     let output = '';
-    let spanText = '';
-    if ((type === 'Visa' || type === 'Mastercard' || type === 'Discover') && ccNumber.length === 16) {
+    if ((type === 'visa' || type === 'mastercard' || type === 'discover') || ccNumber.length === 16) {
         output = ccNumber.match(ccRegEx);
-        spanText = `${output[1]}-${output[2]}-${output[3]}-${output[4]}`
-    } else if (type === 'American express' && ccNumber.length === 15) {
+        ccInput.value = `${output[1]}-${output[2]}-${output[3]}-${output[4]}`
+    } else if (type === 'amex' && ccNumber.length === 15) {
         output = ccNumber.match(amRegEx);
-        spanText = `${output[1]}-${output[2]}-${output[3]}`;
-    } else {
-        if (!output && type === 'Visa') {
-
-            spanText = 'Please enter a valid Visa credit card number';
-        }
-        if (!output && type === 'American express') {
-            spanText = 'Please enter a valid American Express credit card number';
-        }
-        if (!output && type === 'Mastercard') {
-            spanText = 'Please enter a valid Mastercard credit card number';
-        }
-    }
-    return spanText;
+        ccInput.value = `${output[1]}-${output[2]}-${output[3]}`;
+    } 
 }
 
-ccInput.addEventListener('input',(e) => {
-    ccNumber = e.target.value;
-    insertLogo(ccNumber);
-    ccValidate(ccNumber);
-});
-
-
-const zipInput = document.getElementById('zip');
-zipInput.setAttribute('maxlength', 5);
-
-zipInput.addEventListener('input', (e) => {
-    if(/\D/.test(e.target.value)) {
-        zipInput.value = zipInput.value.replace(/\D/,'');
-    }
-});
-
-const cvvInput = document.getElementById('cvv');
-cvvInput.setAttribute('maxlength', 3);
-
-cvvInput.addEventListener('input', (e) => {
-    if(/\D/.test(e.target.value)) {
-        cvvInput.value = cvvInput.value.replace(/\D/,'');
-    }
-});
+userName.focus();
+insertLogo(1);

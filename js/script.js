@@ -1,3 +1,4 @@
+//Created an unecessary object to cut down on typing for snagging elements. 
 let grabEl = {
     id: function(id) {return document.getElementById(id);},
     class: function(id) {return document.getElementById(id);},
@@ -38,24 +39,9 @@ ccInput.setAttribute('maxlength', 16);
 cvvInput.setAttribute('maxlength', 3);
 zipInput.setAttribute('maxlength', 5);
 displayShirtColor(shirtDesign.value, false);
-displayShirtColor(shirtDesign.value, false);
 paymentMethods(paymentMethod[1].value);
 
-
-//Creating an element to enter for valid email
-function enterValidEmail() {
-    const emailHint = grabEl.id('email-hint');
-    const span = document.createElement('span');
-    span.className = 'enter-valid-email';
-    if (emailHint.parentNode.querySelectorAll('.enter-valid-email').length === 0) {
-        span.style.color = 'red';
-        span.textContent = 'Please insert a valid e-mail';
-        emailHint.parentNode.insertBefore(span, emailHint);
-    }
-}
-
-//Validate Email Address
-//Split into 3 matches by excluding @ and . before com or net, etc.
+//Validate Email Address | Split into 3 matches by excluding @ and . before com or net, etc.
 function emailValidate(email) {
     const regEx = /^\w*@\w*\.\w{2,}$/g;
     if (!regEx.test(email)) {
@@ -66,6 +52,17 @@ function emailValidate(email) {
         if (span) {
             span.parentNode.removeChild(span);
         }
+    }
+}
+
+function enterValidEmail() {
+    const emailHint = grabEl.id('email-hint');
+    const span = document.createElement('span');
+    span.className = 'enter-valid-email';
+    if (emailHint.parentNode.querySelectorAll('.enter-valid-email').length === 0) {
+        span.style.color = 'red';
+        span.textContent = 'Please insert a valid e-mail';
+        emailHint.parentNode.insertBefore(span, emailHint);
     }
 }
 
@@ -82,34 +79,36 @@ function displayShirtColor(data) {
         }
     }
 }
-//Add up selected courses
+
+//Functions that add up cost of courses and remove any conflics
+let activities = {
+    remove: function(time) {
+        for (let i = 0; i < times.length; i++) {
+            if (times[i].getAttribute('data-day-and-time') === time && !times[i].checked) {
+                times[i].disabled = true;
+            }
+        }
+    },
+    restore: function(time) {
+        for (let i = 0; i < times.length; i++) {
+            if (times[i].getAttribute('data-day-and-time') === time && times[i].disabled) {
+                times[i].disabled = false;
+            }
+        }
+    }
+}
+
 function addCost(amount, bool, time) {
     let total;
     let match = Number(totalCost.innerText.match(/\d+/));
     if (bool) {
         total = match + Number(amount);
-        removeTimeConflict(time);
+        activities.remove(time);
     } else {
         total = match - Number(amount);
-        restoreActivities(time);
+        activities.restore(time);
     }
     totalCost.innerHTML = `Total: $${total}`;
-}
-
-function removeTimeConflict(time) {
-    for (let i = 0; i < times.length; i++) {
-        if (times[i].getAttribute('data-day-and-time') === time && !times[i].checked) {
-            times[i].disabled = true;
-        }
-    }
-}
-
-function restoreActivities(time) {
-    for (let i = 0; i < times.length; i++) {
-        if (times[i].getAttribute('data-day-and-time') === time && times[i].disabled) {
-            times[i].disabled = false;
-        }
-    }
 }
 
 //Event listeners on items that update real time
@@ -188,6 +187,7 @@ function paymentMethods(type) {
         grabEl.id('bitcoin').style.display = '';
     }
 }
+
 function removeExpYear(selectedMonth) {
     const expYear = grabEl.id('exp-year');
     const options = expYear.querySelectorAll('option');
@@ -198,6 +198,7 @@ function removeExpYear(selectedMonth) {
     }
 
 }
+
 function ccType (number) {
     let type = '';
     if (/^4/.test(number)) {
@@ -220,6 +221,7 @@ function ccType (number) {
     }
     return type;
 }
+
 function insertLogo(number) {
     ccInput.style.backgroundImage = `url('img/${ccType(number)}.png')`;
     ccInput.style.backgroundRepeat = "no-repeat";
@@ -227,6 +229,7 @@ function insertLogo(number) {
     ccInput.style.backgroundPosition = "left";
     ccInput.style.paddingLeft = "40px";
 }
+
 function ccValidate(number) {
     let type = ccType(number);
     let output = '';

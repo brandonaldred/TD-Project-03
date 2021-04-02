@@ -69,13 +69,18 @@ function enterValidEmail() {
 //Function to change shirt color options based on the design selected
 function displayShirtColor(data) {
     const shirtColor = grabEl.id('color');
+    if (data === 'Select Theme') {
+        shirtColor.disabled = true;
+    } else {
+        shirtColor.disabled = false;
+    }
     for (let i = 0; i < shirtColor.length; i++) {
         let shirt = shirtColor[i];
         if (shirt.getAttribute('data-theme') === data) {
             shirt.selected = true;
             shirt.hidden = false;
         } else {
-            shirt.hidden = true;
+          shirt.hidden = true;
         }
     }
 }

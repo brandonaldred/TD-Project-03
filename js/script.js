@@ -1,15 +1,25 @@
-//Created an unecessary object to cut down on typing for snagging elements. 
+//Created an unecessary object to cut down on typing for snagging elements.
 let grabEl = {
-    id: function(id) {return document.getElementById(id);},
-    class: function(id) {return document.getElementById(id);},
-    query: function(id) {return document.querySelectorAll(id);},
-    queryAll: function(id) {return document.querySelectorAll(id);},
-    tag: function(id) {return document.getElementsByTagName(id);}
+    id: function (id) {
+        return document.getElementById(id);
+    },
+    class: function (id) {
+        return document.getElementById(id);
+    },
+    query: function (id) {
+        return document.querySelector(id);
+    },
+    queryAll: function (id) {
+        return document.querySelectorAll(id);
+    },
+    tag: function (id) {
+        return document.getElementsByTagName(id);
+    }
 }
 
 //Declaration of all elements
 const userName = grabEl.id('name');
-const emailEl = grabEl.id('email');
+const userEmail = grabEl.id('email');
 const jobRoleOther = grabEl.id('other-job-role');
 const jobRole = grabEl.id('title');
 const shirtDesign = grabEl.id('design');
@@ -80,40 +90,45 @@ function displayShirtColor(data) {
             shirt.selected = true;
             shirt.hidden = false;
         } else {
-          shirt.hidden = true;
+            shirt.hidden = true;
         }
     }
 }
 
 //Functions that add up cost of courses and remove any conflics
 let activities = {
-    remove: function(time) {
+    remove: function (time) {
         for (let i = 0; i < times.length; i++) {
-            if (times[i].getAttribute('data-day-and-time') === time && !times[i].checked) {
+            if (attributeGrabber(times[i], 'data-day-and-time') === time && !times[i].checked) {
                 times[i].disabled = true;
             }
         }
     },
-    restore: function(time) {
+    restore: function (time) {
         for (let i = 0; i < times.length; i++) {
-            if (times[i].getAttribute('data-day-and-time') === time && times[i].disabled) {
+            if (attributeGrabber(times[i], 'data-day-and-time') === time && times[i].disabled) {
                 times[i].disabled = false;
             }
         }
     }
 }
 
+function attributeGrabber(element, attribute) {
+    return element.getAttribute(attribute);
+}
+
 function addCost(amount, bool, time) {
     let total;
     let match = Number(totalCost.innerText.match(/\d+/));
-    if (bool) {
-        total = match + Number(amount);
-        activities.remove(time);
-    } else {
-        total = match - Number(amount);
-        activities.restore(time);
-    }
+    bool ? total = match + Number(amount) : total = match - Number(amount);
+    bool ? activities.remove(time) : activities.restore(time);
     totalCost.innerHTML = `Total: $${total}`;
+}
+
+function digitOnly(target) {
+    if (/\D/.test(target.value)) {
+        target.value = target.value.replace(/\D/, '');
+    }
 }
 
 //Event listeners on items that update real time
@@ -126,30 +141,24 @@ jobRole.addEventListener('input', (e) => {
 });
 
 zipInput.addEventListener('input', (e) => {
-    if(/\D/.test(e.target.value)) {
-        zipInput.value = zipInput.value.replace(/\D/,'');
-    }
+    digitOnly(e.target);
 });
 
 cvvInput.addEventListener('input', (e) => {
-    if(/\D/.test(e.target.value)) {
-        cvvInput.value = cvvInput.value.replace(/\D/,'');
-    }
+    digitOnly(e.target);
 });
 
-ccInput.addEventListener('input',(e) => {
-    ccNumber = e.target.value;
-    insertLogo(ccNumber);
-    ccValidate(ccNumber);
+ccInput.addEventListener('input', (e) => {
+    digitOnly(e.target);
 });
 
-shirtDesign.addEventListener('change', () => {
-    displayShirtColor(shirtDesign.value, true);
+shirtDesign.addEventListener('change', (e) => {
+    displayShirtColor(e.target.value, true);
 });
 
 courses.addEventListener('change', (e) => {
-    let time = e.target.getAttribute('data-day-and-time');
-    let cost = e.target.getAttribute('data-cost');
+    let time = attributeGrabber(e.target, 'data-day-and-time');
+    let cost = attributeGrabber(e.target, 'data-cost');
     e.target.checked ? addCost(cost, true, time) : addCost(cost, false, time);
 });
 
@@ -170,26 +179,43 @@ courses.addEventListener('focusout', (e) => {
 });
 
 submit[0].addEventListener('click', (e) => {
-    if (!userName.value) {
-        console.log('enter name');
+    //If any of the below is false, prevent default
+    //Has name been filled out?
+    if (userName.value.length >= 1 && !(/ \w{2}/.test(userName.value))) {
+        console.log('name not entered');
         e.preventDefault();
+    }
+    //Has email addy been filled out?
+    if (!(userEmail.value.length > 1) || grabEl.query('.enter-valid-email')) {
+        e.preventDefault();
+    }
+    //Has an activity been selected?
+    if (!(Number(totalCost.innerText.match(/\d+/)) > 0)) {
+        e.preventDefault();
+    }
+    //If credit card selected:
+    if (paymentMethod.value === 'credit-card') {
+        //Is card number correct/valid?
+        if (!(ccInput.value.length > 13)) {
+            e.preventDefault();
+        }
+        //Is zip code entered and valid?
+        if (!(zipInput.value.length === 5)) {
+            e.preventDefault();
+        }
+        //Is CVV entered and valid?
+        if (!(cvvInput.value.length === 3)) {
+            e.preventDefault();
+        }
     }
 });
 
 //Change/hide fields depending on payment method selected
 function paymentMethods(type) {
-    if (type === 'credit-card') {
-        grabEl.id('credit-card').style.display = '';
-        grabEl.id('paypal').style.display = 'none';
-        grabEl.id('bitcoin').style.display = 'none';
-    } else if (type === 'paypal') {
-        grabEl.id('credit-card').style.display = 'none';
-        grabEl.id('paypal').style.display = '';
-        grabEl.id('bitcoin').style.display = 'none';
-    } else if (type === 'bitcoin') {
-        grabEl.id('credit-card').style.display = 'none';
-        grabEl.id('paypal').style.display = 'none';
-        grabEl.id('bitcoin').style.display = '';
+    const pmtMethods = ['credit-card', 'paypal', 'bitcoin'];
+    for (let i = 0; i < pmtMethods.length; i++) {
+        let method = pmtMethods[i];
+        method === type ? grabEl.id(method).style.display = '' : grabEl.id(method).style.display = 'none';
     }
 }
 
@@ -204,48 +230,33 @@ function removeExpYear(selectedMonth) {
 
 }
 
-function ccType (number) {
-    let type = '';
-    if (/^4/.test(number)) {
-        type = 'visa'
-    }
-    if (/^6/.test(number)) {
-        type = 'discover'
-    }
-    if (/^34/.test(number) || /^37/.test(number)) {
-        type = 'amex';
-    }
-    if (/^5[1-5]/.test(number)) {
-        type = 'mastercard';
-    }
-    if (/\D/.test(number)) {
-        type = 'invalid';
-    }
-    if (type == '') {
-        type = 'cc';
-    }
-    return type;
+const testItem = document.querySelectorAll('.hint');
+for (let i = 0; i < 2; i++) {
+    testItem[i].style.display = 'inline-block';
 }
 
-function insertLogo(number) {
-    ccInput.style.backgroundImage = `url('img/${ccType(number)}.png')`;
-    ccInput.style.backgroundRepeat = "no-repeat";
-    ccInput.style.backgroundSize = "35px";
-    ccInput.style.backgroundPosition = "left";
-    ccInput.style.paddingLeft = "40px";
-}
+/*
+Form cannot be submitted (the page does not refresh when the submit button is clicked) until the following requirements have been met:
+"Name" field isn’t blank.
+"Email" field contains a correctly formatted email address.
+At least one activity has been selected.
+If "Credit Card" is the selected payment option, the three credit card fields accept only numbers: a 13 to 16-digit credit card number, a 5-digit zip code, and 3-digit CVV value.
+When all the required fields are filled out correctly, the form submits (the page refreshes on its own when the submit button is clicked).
 
-function ccValidate(number) {
-    let type = ccType(number);
-    let output = '';
-    if ((type === 'visa' || type === 'mastercard' || type === 'discover') || ccNumber.length === 16) {
-        output = ccNumber.match(ccRegEx);
-        ccInput.value = `${output[1]}-${output[2]}-${output[3]}-${output[4]}`
-    } else if (type === 'amex' && ccNumber.length === 15) {
-        output = ccNumber.match(amRegEx);
-        ccInput.value = `${output[1]}-${output[2]}-${output[3]}`;
-    } 
-}
+On submission, the validation error message, icon and color are displayed on invalid required fields:
+"Name"
+"Email Address"
+"Register for Activities"
+If "Credit Card" is the selected payment method:
+"Card Number"
+"Zip Code"
+"CVV"
+
+
+At least one required form field provides validation error messages that differ depending on the reason the field is invalid.
+Form fields that have real time validation and conditional error messages are detailed in the project’s README.me file.
+
+
+*/
 
 userName.focus();
-insertLogo(1);

@@ -51,6 +51,15 @@ zipInput.setAttribute('maxlength', 5);
 displayShirtColor(shirtDesign.value, false);
 paymentMethods(paymentMethod[1].value);
 
+const validations = {
+    name: (name) => name.length >= 1 && / \w{2}/.test(name),
+    email: (email) => { (email.length > 1) || grabEl.query('.enter-valid-email') },
+    cost: (cost) => { Number(cost.match(/\d+/)) > 0 },
+    cc: (ccNum) => { ccNum.length > 13 },
+    zip: (zip) => { zip.length === 5 },
+    cvv: (cvv) => { cvv.length === 3; }
+}
+
 //Validate Email Address | Split into 3 matches by excluding @ and . before com or net, etc.
 function emailValidate(email) {
     const regEx = /^\w*@\w*\.\w{2,}$/g;
@@ -179,36 +188,17 @@ courses.addEventListener('focusout', (e) => {
 });
 
 submit[0].addEventListener('click', (e) => {
-    //If any of the below is false, prevent default
-    //Has name been filled out?
-    if (userName.value.length >= 1 && !(/ \w{2}/.test(userName.value))) {
-        console.log('name not entered');
-        e.preventDefault();
-    }
-    //Has email addy been filled out?
-    if (!(userEmail.value.length > 1) || grabEl.query('.enter-valid-email')) {
-        e.preventDefault();
-    }
-    //Has an activity been selected?
-    if (!(Number(totalCost.innerText.match(/\d+/)) > 0)) {
-        e.preventDefault();
-    }
-    //If credit card selected:
-    if (paymentMethod.value === 'credit-card') {
-        //Is card number correct/valid?
-        if (!(ccInput.value.length > 13)) {
-            e.preventDefault();
-        }
-        //Is zip code entered and valid?
-        if (!(zipInput.value.length === 5)) {
-            e.preventDefault();
-        }
-        //Is CVV entered and valid?
-        if (!(cvvInput.value.length === 3)) {
-            e.preventDefault();
-        }
+    //Run through all of the validations and if there are errors, display the messages. Then prevent the default action for submit.
+    e.preventDefault();
+    const testItem = document.querySelectorAll('.hint');
+    const keys = Object.keys(validations);
+    for (let i = 0; i < testItem.length; i++) {
+        let sibling = testItem[i].previousSibling;
+        //console.log(testItem[i].previousElementSibling.id);
+        testItem[i].style.display = 'inline-block';
     }
 });
+
 
 //Change/hide fields depending on payment method selected
 function paymentMethods(type) {
@@ -229,12 +219,6 @@ function removeExpYear(selectedMonth) {
     }
 
 }
-
-const testItem = document.querySelectorAll('.hint');
-for (let i = 0; i < 2; i++) {
-    testItem[i].style.display = 'inline-block';
-}
-
 /*
 Form cannot be submitted (the page does not refresh when the submit button is clicked) until the following requirements have been met:
 "Name" field isn’t blank.

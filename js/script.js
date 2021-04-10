@@ -17,7 +17,7 @@ let grabEl = {
     }
 }
 
-//Declaration of all elements
+//Grabbing & Declaring all of the elemnts to be worked with
 const userName = grabEl.id('name');
 const userEmail = grabEl.id('email');
 const jobRoleOther = grabEl.id('other-job-role');
@@ -35,6 +35,7 @@ const year = date.getFullYear();
 const expMonth = grabEl.id('exp-month');
 const currentYear = document.createElement('option');
 const cvvInput = grabEl.id('cvv');
+//These were for proper formatting depending on type of card - not to be used on this project
 // const ccRegEx = /^(\d{4})[ -]?(\d{4})[ -]?(\d{4})[ -]?(\d{4})$/;
 // const amRegEx = /^(\d{4})[ -]?(\d{6})[ -]?(\d{5})/;
 const email = grabEl.id('email');
@@ -218,28 +219,5 @@ function removeExpYear(selectedMonth) {
     const options = expYear.querySelectorAll('option');
     options[1].value == year && selectedMonth < month ? options[1].hidden = true : options[1].hidden = false
 }
-/*
-Form cannot be submitted (the page does not refresh when the submit button is clicked) until the following requirements have been met:
-"Name" field isn’t blank.
-"Email" field contains a correctly formatted email address.
-At least one activity has been selected.
-If "Credit Card" is the selected payment option, the three credit card fields accept only numbers: a 13 to 16-digit credit card number, a 5-digit zip code, and 3-digit CVV value.
-When all the required fields are filled out correctly, the form submits (the page refreshes on its own when the submit button is clicked).
-
-On submission, the validation error message, icon and color are displayed on invalid required fields:
-"Name"
-"Email Address"
-"Register for Activities"
-If "Credit Card" is the selected payment method:
-"Card Number"
-"Zip Code"
-"CVV"
-
-
-At least one required form field provides validation error messages that differ depending on the reason the field is invalid.
-Form fields that have real time validation and conditional error messages are detailed in the project’s README.me file.
-
-
-*/
 
 userName.focus();

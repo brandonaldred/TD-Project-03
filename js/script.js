@@ -51,14 +51,6 @@ zipInput.setAttribute('maxlength', 5);
 displayShirtColor(shirtDesign.value, false);
 paymentMethods(paymentMethod[1].value);
 
-const validations = {
-    name: (name) => name.length >= 1 && / \w{2}/.test(name),
-    email: (email) => { (email.length > 1) || grabEl.query('.enter-valid-email') },
-    cost: (cost) => { Number(cost.match(/\d+/)) > 0 },
-    cc: (ccNum) => { ccNum.length > 13 },
-    zip: (zip) => { zip.length === 5 },
-    cvv: (cvv) => { cvv.length === 3; }
-}
 
 //Validate Email Address | Split into 3 matches by excluding @ and . before com or net, etc.
 function emailValidate(email) {
@@ -187,15 +179,27 @@ courses.addEventListener('focusout', (e) => {
     e.target.parentNode.style.borderColor = '';
 });
 
+const validations = {
+    name: (name) => name.value.length > 1,
+    email: (email) => /\w+@\w+\.\w+/.test(email.value),
+    activities: (cost) => Number(cost.textContent.match(/\d+/)) > 0,
+    cc: (ccNum) => ccNum.value.length > 12,
+    zip: (zip) => zip.value.length === 5,
+    cvv: (cvv) => cvv.value.length === 3
+}
+
 submit[0].addEventListener('click', (e) => {
     //Run through all of the validations and if there are errors, display the messages. Then prevent the default action for submit.
-    e.preventDefault();
     const testItem = document.querySelectorAll('.hint');
-    const keys = Object.keys(validations);
     for (let i = 0; i < testItem.length; i++) {
-        let sibling = testItem[i].previousSibling;
-        //console.log(testItem[i].previousElementSibling.id);
-        testItem[i].style.display = 'inline-block';
+        testItem[i].style.display = 'none';
+        let element = testItem[i].previousElementSibling;
+        let id = element.getAttribute('ID').match(/^\w+/);
+        if(!validations[id[0]](element)) {
+            e.preventDefault();
+            testItem[i].style.display = 'block';
+        }
+        //validations[name[0]](vlue));
     }
 });
 
@@ -212,12 +216,7 @@ function paymentMethods(type) {
 function removeExpYear(selectedMonth) {
     const expYear = grabEl.id('exp-year');
     const options = expYear.querySelectorAll('option');
-    if (options[1].value == year && selectedMonth < month) {
-        options[1].hidden = true;
-    } else {
-        options[1].hidden = false;
-    }
-
+    options[1].value == year && selectedMonth < month ? options[1].hidden = true : options[1].hidden = false
 }
 /*
 Form cannot be submitted (the page does not refresh when the submit button is clicked) until the following requirements have been met:

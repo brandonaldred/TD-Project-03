@@ -184,9 +184,9 @@ const validations = {
     name: (name) => name.value.length > 1,
     email: (email) => /\w+@\w+\.\w+/.test(email.value),
     activities: (cost) => Number(cost.textContent.match(/\d+/)) > 0,
-    cc: (ccNum) => ccNum.value.length > 12,
-    zip: (zip) => zip.value.length === 5,
-    cvv: (cvv) => cvv.value.length === 3
+    cc: (ccNum) => paymentMethod.value === 'credit-card' ? ccNum.value.length > 12 : true,
+    zip: (zip) => paymentMethod.value === 'credit-card' ? zip.value.length === 5 : true,
+    cvv: (cvv) => paymentMethod.value === 'credit-card' ? cvv.value.length === 3 : true
 }
 
 submit[0].addEventListener('click', (e) => {
@@ -196,11 +196,11 @@ submit[0].addEventListener('click', (e) => {
         testItem[i].style.display = 'none';
         let element = testItem[i].previousElementSibling;
         let id = element.getAttribute('ID').match(/^\w+/);
-        if(!validations[id[0]](element)) {
+        if (!validations[id[0]](element)) {
             e.preventDefault();
-            testItem[i].style.display = 'block';
+            testItem[i].className = 'hint not-valid';
+            testItem[i].style.display = 'inline';
         }
-        //validations[name[0]](vlue));
     }
 });
 
